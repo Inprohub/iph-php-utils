@@ -1,0 +1,23 @@
+{
+    "name": "inprohub/iph-php-utils",
+    "description": "This is a utils for IPH PHP Project.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Inprohub\\Utils\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Shun",
+            "email": "Ys.Cheng@goldenf.co"
+        }
+    ],
+    "require": {
+        "nesbot/carbon": "^2.16"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    }
+}
