@@ -48,6 +48,11 @@ class Precount
             throw new Exception('開始時間不能大於結束時間');
         }
 
+        $nowTimestamp = Carbon::now($tz)->getTimestampMs();
+        if ($endTimestamp > $nowTimestamp) {
+            $endTimestamp = $nowTimestamp;
+        }
+
         $splitTimeRange = new SplitTimeRange();
         $interval = Carbon::createFromTimestampMs($startTimestamp, $tz)
             ->diffInSeconds(Carbon::createFromTimestampMs($endTimestamp, $tz)->addMilliseconds());
