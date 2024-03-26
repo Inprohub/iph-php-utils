@@ -65,26 +65,22 @@ class Precount
             return $splitTimeRange;
         }
 
-        // 剛好30分鐘
+        // mod 30 minute = 0
         $startTime = Carbon::createFromTimestampMs($startTimestamp, $tz);
         $startTimeMinute = $startTime->minute;
-        if ($interval === self::$precountMinuteUnits * 60) {
+        if ($interval % self::$precountMinuteUnits * 60 === 0) {
             // 如果剛好壓在 precount 上 就直接使用
-            if ($startTime->second === 0 && $startTime->micro === 0 && ($startTimeMinute === 0 || $startTimeMinute === 30)) {
+            if ($startTime->second === 0 && $startTime->milli === 0 && ($startTimeMinute === 0 || $startTimeMinute === 30)) {
                 $splitTimeRange->precount = new PrecountAlias();
                 $splitTimeRange->precount->start = $startTimestamp;
                 $splitTimeRange->precount->end = $endTimestamp;
                 return $splitTimeRange;
             }
-            $splitTimeRange->nextRange = new NextRange();
-            $splitTimeRange->nextRange->start = $startTimestamp;
-            $splitTimeRange->nextRange->end = $endTimestamp;
-            return $splitTimeRange;
         }
 
         // 30分鐘以上
         $starTimeDiffMinute = (self::$precountMinuteUnits - $startTimeMinute % self::$precountMinuteUnits) % self::$precountMinuteUnits;
-        if ($starTimeDiffMinute !== 0 || $startTime->second !== 0 || $startTime->micro !== 0) {
+        if ($starTimeDiffMinute !== 0 || $startTime->second !== 0 || $startTime->milli !== 0) {
             $splitTimeRange->prevRange = new PrevRange();
             $splitTimeRange->prevRange->start = $startTimestamp;
             $splitTimeRange->prevRange->end = Carbon::createFromTimestampMs($startTimestamp, $tz)
@@ -129,6 +125,7 @@ class Precount
             === $splitTimeRange->nextRange->start) {
             $splitTimeRange->nextRange->start = $splitTimeRange->prevRange->start;
             $splitTimeRange->prevRange = null;
+            $splitTimeRange->precount = null;
         }
 
         return $splitTimeRange;
