@@ -68,7 +68,7 @@ class Precount
         // mod 30 minute = 0
         $startTime = Carbon::createFromTimestampMs($startTimestamp, $tz);
         $startTimeMinute = $startTime->minute;
-        if ($interval % self::$precountMinuteUnits * 60 === 0) {
+        if ($interval / 60 % self::$precountMinuteUnits === 0) {
             // 如果剛好壓在 precount 上 就直接使用
             if ($startTime->second === 0 && $startTime->milli === 0 && ($startTimeMinute === 0 || $startTimeMinute === 30)) {
                 $splitTimeRange->precount = new PrecountAlias();
