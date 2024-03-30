@@ -1,0 +1,174 @@
+syntax = "proto3";
+
+package game;
+
+option go_package = "./game";
+option php_namespace = "Grpc\\Build\\Game";
+
+message MemberBalanceRequest{
+    string opCode = 1;
+    string account = 2;
+    string gameBrandCode = 3;
+    string lang = 4;
+}
+
+message MemberBalanceResponse{
+    string account = 1;
+    string walletCode = 2;
+    double balance = 3;
+    string currency = 4;
+}
+
+message CreateMemberRequest {
+    string opCode = 1;
+    string account = 2;
+    string gameBrandCode = 3;
+    string lang = 4;
+}
+
+message CreateMemberResponse {
+    string account = 1;
+}
+
+message LaunchGameRequest {
+    string opCode = 1;
+    string account = 2;
+    string gameBrandCode = 3;
+    string gameCode = 4;
+    string lang = 5;
+}
+
+message LaunchGameResponse {
+    string url = 1;
+}
+
+message TransferInRequest {
+    string opCode = 1;
+    string account = 2;
+    string gameBrandCode = 3;
+    string lang = 4;
+    string traceId = 5;
+    double amount = 6;
+}
+
+message TransferOutRequest {
+    string opCode = 1;
+    string account = 2;
+    string gameBrandCode = 3;
+    string lang = 4;
+    string traceId = 5;
+}
+
+message TransferResponse {
+    string opCode = 1;
+    string account = 2;
+    double amount = 3;
+    string traceId = 4;
+}
+
+message GetPlayerTransactionRequest {
+    string opCode = 1;
+    string account = 2;
+    string gameBrandCode = 3;
+    string lang = 4;
+    string traceId = 5;
+}
+
+message GetPlayerTransactionResponse {
+    string account = 1;
+    double beforeBalance = 2;
+    double amount = 3;
+    double balance = 4;
+    string traceId = 5;
+}
+
+message GetAllGamesRequest {
+    string opCode = 1;
+    string account = 2;
+    string lang = 3;
+    string vendor = 4;
+    string filter = 5;
+    int64 page = 6;
+    int64 perPage = 7;
+}
+
+message GetAllGamesResponse {
+    int64 currentPage = 1;
+    int64 perPage = 2;
+    int64 lastPage = 3;
+    int64 total = 4;
+    repeated AllGameData data = 5;
+}
+
+message AllGameData {
+    string gameCode = 1;
+    string hot = 2;
+    string localizedName = 3;
+    string localizedRemark = 4;
+    string new = 5;
+    string playerCount = 6;
+    string status = 7;
+    string featured = 8;
+    string favor = 9;
+    AllGameDataGame game = 10;
+}
+
+message AllGameDataGame{
+    string gameBrandCode = 1;
+    string gameCode = 2;
+    string image = 3;
+}
+
+message GetFavorGamesRequest{
+    string opCode = 1;
+    string account = 2;
+    string lang = 3;
+    string vendor = 4;
+    string filter = 5;
+    int64 page = 6;
+    int64 perPage = 7;
+}
+
+message GetFavorGamesResponse{
+    int64 currentPage = 1;
+    int64 perPage = 2;
+    int64 lastPage = 3;
+    int64 total = 4;
+    repeated AllGameData data = 5;
+}
+
+message HZVerifySessionTokenRequest{
+    string sessionToken = 1;
+}
+
+message HZVerifySessionTokenResponse{
+    string opCode = 1;
+    string account = 2;
+    string memberCode = 3;
+}
+
+message GetBetlogDetailRequest{
+    string opCode = 1;
+    string traceId = 2;
+    string lang = 3;
+}
+
+message GetBetlogDetailResponse{
+    string url = 1;
+}
+
+service Game {
+    rpc getMemberBalance (MemberBalanceRequest) returns (MemberBalanceResponse);
+    rpc createMember(CreateMemberRequest) returns (CreateMemberResponse);
+    rpc launchGame(LaunchGameRequest) returns (LaunchGameResponse);
+    rpc transferIn(TransferInRequest) returns (TransferResponse);
+    rpc transferOut(TransferOutRequest) returns (TransferResponse);
+    rpc getPlayerTransaction(GetPlayerTransactionRequest) returns (GetPlayerTransactionResponse);
+    rpc getBetlogDetail(GetBetlogDetailRequest) returns (GetBetlogDetailResponse);
+
+    rpc getAllGames(GetAllGamesRequest) returns (GetAllGamesResponse);
+    rpc getFavorGames(GetFavorGamesRequest) returns (GetFavorGamesResponse);
+
+    // hz
+    rpc hzVerifySessionToken(HZVerifySessionTokenRequest) returns (HZVerifySessionTokenResponse);
+}
