@@ -40,12 +40,12 @@ class Precount
     {
         // 檢查是否為Timestamp13位數
         if (!Tool::timestampCheck($startTimestamp) || !Tool::timestampCheck($endTimestamp)) {
-            throw new Exception('時間格式錯誤');
+            throw new Exception(sprintf('時間格式錯誤: %d, %d', $startTimestamp, $endTimestamp));
         }
 
         // 時間錯誤
         if ($endTimestamp < $startTimestamp) {
-            throw new Exception('開始時間不能大於結束時間');
+            throw new Exception(sprintf('開始時間不能大於結束時間: %d, %d', $startTimestamp, $endTimestamp));
         }
 
         $nowTimestamp = Carbon::now($tz)->getTimestampMs();
@@ -67,10 +67,16 @@ class Precount
 
         // mod 30 minute = 0
         $startTime = Carbon::createFromTimestampMs($startTimestamp, $tz);
+        $endTimeTmp = Carbon::createFromTimestampMs($endTimestamp, $tz);
         $startTimeMinute = $startTime->minute;
         if ($interval / 60 % self::$precountMinuteUnits === 0) {
             // 如果剛好壓在 precount 上 就直接使用
-            if ($startTime->second === 0 && $startTime->milli === 0 && ($startTimeMinute === 0 || $startTimeMinute === 30)) {
+            if (
+                $endTimeTmp->addSeconds(self::$bufferSeconds)->lessThanOrEqualTo(Carbon::now($tz))
+                && $startTime->second === 0
+                && $startTime->milli === 0
+                && ($startTimeMinute === 0 || $startTimeMinute === 30)
+            ) {
                 $splitTimeRange->precount = new PrecountAlias();
                 $splitTimeRange->precount->start = $startTimestamp;
                 $splitTimeRange->precount->end = $endTimestamp;
@@ -92,14 +98,12 @@ class Precount
         $endTime = Carbon::createFromTimestampMs($endTimestamp, $tz);
         $endTimeMinute = $endTime->minute;
         $endTimeDiffMinute = $endTimeMinute % self::$precountMinuteUnits;
-        if ($endTimeDiffMinute !== 0 || $endTime->second !== 0 || $endTime->millisecond !== 0) {
-            $splitTimeRange->nextRange = new NextRange();
-            $splitTimeRange->nextRange->start = Carbon::createFromTimestampMs($endTimestamp, $tz)
-                ->startOfMinute()
-                ->subminutes($endTimeDiffMinute)
-                ->getTimestampMs();
-            $splitTimeRange->nextRange->end = $endTimestamp;
-        }
+        $splitTimeRange->nextRange = new NextRange();
+        $splitTimeRange->nextRange->start = Carbon::createFromTimestampMs($endTimestamp, $tz)
+            ->startOfMinute()
+            ->subminutes($endTimeDiffMinute)
+            ->getTimestampMs();
+        $splitTimeRange->nextRange->end = $endTimestamp;
 
         $splitTimeRange->precount = new PrecountAlias();
         $splitTimeRange->precount->start = Carbon::createFromTimestampMs($startTimestamp, $tz)
