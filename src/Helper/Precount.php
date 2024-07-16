@@ -17,7 +17,7 @@ class Precount
      * 避免還沒算計算 就去拿 precount 的資料
      * @var int
      */
-    protected static int $bufferSeconds = 10 * 60;
+    protected static int $bufferSeconds = 20 * 60;
 
     /**
      * 多少分鐘算一個 precount
@@ -58,7 +58,7 @@ class Precount
             ->diffInSeconds(Carbon::createFromTimestampMs($endTimestamp, $tz)->addMilliseconds());
 
         // 小於30分鐘 直接使用 raw data
-        if ($interval < self::$precountMinuteUnits * 60) {
+        if ($interval < self::$precountMinuteUnits * 60 + self::$bufferSeconds) {
             $splitTimeRange->nextRange = new NextRange();
             $splitTimeRange->nextRange->start = $startTimestamp;
             $splitTimeRange->nextRange->end = $endTimestamp;
@@ -69,7 +69,7 @@ class Precount
         $startTime = Carbon::createFromTimestampMs($startTimestamp, $tz);
         $endTimeTmp = Carbon::createFromTimestampMs($endTimestamp, $tz);
         $startTimeMinute = $startTime->minute;
-        if ($interval / 60 % self::$precountMinuteUnits === 0) {
+        if ($interval / 60 % (self::$precountMinuteUnits + self::$bufferSeconds) === 0) {
             // 如果剛好壓在 precount 上 就直接使用
             if (
                 $endTimeTmp->addSeconds(self::$bufferSeconds)->lessThanOrEqualTo(Carbon::now($tz))
@@ -131,6 +131,10 @@ class Precount
             $splitTimeRange->prevRange = null;
             $splitTimeRange->precount = null;
         }
+        //
+        // if (isset($splitTimeRange->precount) && $splitTimeRange->precount->end < $splitTimeRange->precount->start) {
+        //     $splitTimeRange->precount = null;
+        // }
 
         return $splitTimeRange;
     }
