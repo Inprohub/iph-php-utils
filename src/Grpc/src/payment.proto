@@ -1,0 +1,95 @@
+syntax = "proto3";
+
+package payment;
+
+option go_package = "./payment";
+option php_namespace = "Grpc\\Build\\Payment";
+
+message DepositRequest {
+    string opCode = 1;
+    string orderNo = 2;
+    string amount = 3;
+    string currency = 4;
+    string notifyUrl = 5;
+    string payType = 6;
+    optional string bankName = 7;
+    optional string attach = 8;
+    optional string userIp = 9;
+    optional string payTypeNo = 10;
+    optional string protocol = 11;
+}
+
+message DepositResponse {
+    string payUrl = 1;
+    string rawResponse = 2;
+    optional string payOrderNo = 3;
+}
+
+message WithdrawRequest {
+    string opCode = 1;
+    string orderNo = 2;
+    double amount = 3;
+    string currency = 4;
+    string notifyUrl = 5;
+    string platform = 6;
+    BankCard bankCard = 7;
+}
+
+message BankCard {
+    string bankId = 1;
+    string bankName = 2;
+    string bankNo = 3;
+    string defrayName = 4;
+    optional string bankProvince = 5;
+    optional string bankCity = 6;
+    optional string bankBranch = 7;
+    optional string mobile = 8;
+    optional string protocol = 9;
+    optional string ifscCode = 10;
+}
+
+message WithdrawResponse {
+    string rawResponse = 1;
+    optional string payOrderNo = 2;
+}
+
+message NotifySignCheckRequest {
+    string opCode = 1;
+    string platform = 2;
+    string rawRequest = 3;
+}
+
+message NotifySignCheckResponse {
+    string orderNo = 1;
+    string amount = 2;
+    bool isSuccess = 3;
+}
+
+message DepositQueryRequest {
+    string opCode = 1;
+    string platform = 2;
+    string orderNo = 3;
+}
+
+message DepositQueryResponse {
+    string rawResponse = 1;
+}
+
+message WithdrawQueryRequest {
+    string opCode = 1;
+    string platform = 2;
+    string orderNo = 3;
+}
+
+message WithdrawQueryResponse {
+    string rawResponse = 1;
+}
+
+service Payment {
+    rpc Deposit(DepositRequest) returns (DepositResponse);
+    rpc Withdraw(WithdrawRequest) returns (WithdrawResponse);
+    rpc DepositNotifySignCheck(NotifySignCheckRequest) returns (NotifySignCheckResponse);
+    rpc WithdrawNotifySignCheck(NotifySignCheckRequest) returns (NotifySignCheckResponse);
+    rpc DepositQuery(DepositQueryRequest) returns (DepositQueryResponse);
+    rpc WithdrawQuery(WithdrawQueryRequest) returns (WithdrawQueryResponse);
+}
