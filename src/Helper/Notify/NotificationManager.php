@@ -2,6 +2,8 @@
 
 namespace Inprohub\Utils\Helper\Notify;
 
+use Exception;
+
 class NotificationManager
 {
     /**
@@ -25,7 +27,11 @@ class NotificationManager
             if (!$notifier instanceof NotifyInterface) {
                 continue;
             }
-            $notifier->send($message);
+            try {
+                $notifier->send($message);
+            } catch (Exception $exception) {
+                continue;
+            }
         }
     }
 }

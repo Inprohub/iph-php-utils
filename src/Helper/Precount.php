@@ -17,7 +17,7 @@ class Precount
      * 避免還沒算計算 就去拿 precount 的資料
      * @var int
      */
-    protected static int $bufferSeconds = 20 * 60;
+    protected static int $bufferSeconds = 35 * 60;
 
     /**
      * 多少分鐘算一個 precount
@@ -57,84 +57,70 @@ class Precount
         $interval = Carbon::createFromTimestampMs($startTimestamp, $tz)
             ->diffInSeconds(Carbon::createFromTimestampMs($endTimestamp, $tz)->addMilliseconds());
 
-        // 小於30分鐘 直接使用 raw data
-        if ($interval < self::$precountMinuteUnits * 60 + self::$bufferSeconds) {
+        // 小於 30 分鐘
+        if ($interval / 60 < self::$precountMinuteUnits) {
             $splitTimeRange->nextRange = new NextRange();
             $splitTimeRange->nextRange->start = $startTimestamp;
             $splitTimeRange->nextRange->end = $endTimestamp;
             return $splitTimeRange;
         }
 
-        // mod 30 minute = 0
-        $startTime = Carbon::createFromTimestampMs($startTimestamp, $tz);
-        $endTimeTmp = Carbon::createFromTimestampMs($endTimestamp, $tz);
-        $startTimeMinute = $startTime->minute;
-        if ($interval / 60 % (self::$precountMinuteUnits + self::$bufferSeconds) === 0) {
-            // 如果剛好壓在 precount 上 就直接使用
-            if (
-                $endTimeTmp->addSeconds(self::$bufferSeconds)->lessThanOrEqualTo(Carbon::now($tz))
-                && $startTime->second === 0
-                && $startTime->milli === 0
-                && ($startTimeMinute === 0 || $startTimeMinute === 30)
-            ) {
+
+
+        $tmp = $nowTimestamp - self::$bufferSeconds * 1000;
+        $lastPrecountEnd = $tmp - $tmp % (self::$precountMinuteUnits * 60 * 1000);
+
+        // 等於 30 分鐘
+        if ($interval / 60 % self::$precountMinuteUnits === 0 && Carbon::createFromTimestampMs($startTimestamp)->minute === 0) {
+            if ($endTimestamp < $lastPrecountEnd ) {
                 $splitTimeRange->precount = new PrecountAlias();
                 $splitTimeRange->precount->start = $startTimestamp;
                 $splitTimeRange->precount->end = $endTimestamp;
-                return $splitTimeRange;
+            } else {
+                $splitTimeRange->precount = new PrecountAlias();
+                $splitTimeRange->precount->start = $startTimestamp;
+                $splitTimeRange->precount->end = $lastPrecountEnd;
+
+                $splitTimeRange->nextRange = new NextRange();
+                $splitTimeRange->nextRange->start = $lastPrecountEnd;
+                $splitTimeRange->nextRange->end = $endTimestamp;
             }
+
+            return $splitTimeRange;
         }
 
-        // 30分鐘以上
-        $starTimeDiffMinute = (self::$precountMinuteUnits - $startTimeMinute % self::$precountMinuteUnits) % self::$precountMinuteUnits;
-        if ($starTimeDiffMinute !== 0 || $startTime->second !== 0 || $startTime->milli !== 0) {
-            $splitTimeRange->prevRange = new PrevRange();
-            $splitTimeRange->prevRange->start = $startTimestamp;
-            $splitTimeRange->prevRange->end = Carbon::createFromTimestampMs($startTimestamp, $tz)
-                ->startOfMinute()
-                ->addMinutes($starTimeDiffMinute)
-                ->getTimestampMs();
+        $precountStart = Carbon::createFromTimestampMs($startTimestamp)->ceilMinutes(self::$precountMinuteUnits)->getTimestampMs();
+        $precountEnd = Carbon::createFromTimestampMs($endTimestamp)->floorMinutes(self::$precountMinuteUnits)->getTimestampMs();
+        if ($precountEnd > $lastPrecountEnd) {
+            $precountEnd = $lastPrecountEnd;
         }
 
-        $endTime = Carbon::createFromTimestampMs($endTimestamp, $tz);
-        $endTimeMinute = $endTime->minute;
-        $endTimeDiffMinute = $endTimeMinute % self::$precountMinuteUnits;
+        if ($precountEnd > $precountStart) {
+            $splitTimeRange->precount = new PrecountAlias();
+            $splitTimeRange->precount->start = $precountStart;
+            $splitTimeRange->precount->end = $precountEnd;
+        }
+
+        $splitTimeRange->prevRange = new PrevRange();
+        $splitTimeRange->prevRange->start = $startTimestamp;
+        $splitTimeRange->prevRange->end = $precountStart;
+
         $splitTimeRange->nextRange = new NextRange();
-        $splitTimeRange->nextRange->start = Carbon::createFromTimestampMs($endTimestamp, $tz)
-            ->startOfMinute()
-            ->subminutes($endTimeDiffMinute)
-            ->getTimestampMs();
+        $splitTimeRange->nextRange->start = $precountEnd;
         $splitTimeRange->nextRange->end = $endTimestamp;
 
-        $splitTimeRange->precount = new PrecountAlias();
-        $splitTimeRange->precount->start = Carbon::createFromTimestampMs($startTimestamp, $tz)
-            ->startOfMinute()
-            ->addMinutes($starTimeDiffMinute)
-            ->getTimestampMs();
-        $splitTimeRange->precount->end = Carbon::createFromTimestampMs($endTimestamp, $tz)
-            ->startOfMinute()
-            ->subminutes($endTimeDiffMinute)
-            ->getTimestampMs();
-
-        if ($splitTimeRange->precount->end > $splitTimeRange->nextRange->end - self::$bufferSeconds * 1000) {
-            if ($splitTimeRange->precount->end - self::$precountMinuteUnits * 60 * 1000 === $splitTimeRange->precount->start) {
-                $splitTimeRange->prevRange->end = $splitTimeRange->precount->end;
-                $splitTimeRange->precount = null;
-            } else {
-                $splitTimeRange->precount->end -= self::$precountMinuteUnits * 60 * 1000;
-                $splitTimeRange->nextRange->start = $splitTimeRange->precount->end;
-            }
-        }
-
-        if (isset($splitTimeRange->prevRange) && isset($splitTimeRange->nextRange) && $splitTimeRange->prevRange->end
-            === $splitTimeRange->nextRange->start) {
+        if (is_null($splitTimeRange->precount)) {
             $splitTimeRange->nextRange->start = $splitTimeRange->prevRange->start;
             $splitTimeRange->prevRange = null;
-            $splitTimeRange->precount = null;
         }
-        //
-        // if (isset($splitTimeRange->precount) && $splitTimeRange->precount->end < $splitTimeRange->precount->start) {
-        //     $splitTimeRange->precount = null;
-        // }
+
+        if ($splitTimeRange->prevRange->end === $splitTimeRange->prevRange->start) {
+            $splitTimeRange->prevRange = null;
+        }
+
+        if ($splitTimeRange->nextRange->end === $splitTimeRange->nextRange->start) {
+            $splitTimeRange->nextRange = null;
+        }
 
         return $splitTimeRange;
     }
