@@ -65,20 +65,17 @@ class Precount
             return $splitTimeRange;
         }
 
-
-
         $tmp = $nowTimestamp - self::$bufferSeconds * 1000;
         $lastPrecountEnd = $tmp - $tmp % (self::$precountMinuteUnits * 60 * 1000);
 
         // 等於 30 分鐘
-        if ($interval / 60 % self::$precountMinuteUnits === 0 && Carbon::createFromTimestampMs($startTimestamp)->minute === 0) {
-            if ($endTimestamp < $lastPrecountEnd ) {
-                $splitTimeRange->precount = new PrecountAlias();
-                $splitTimeRange->precount->start = $startTimestamp;
+        if ($interval / 60 % self::$precountMinuteUnits === 0 && Carbon::createFromTimestampMs($startTimestamp)->minute % self::$precountMinuteUnits === 0) {
+            $splitTimeRange->precount = new PrecountAlias();
+            $splitTimeRange->precount->start = $startTimestamp;
+
+            if ($endTimestamp < $lastPrecountEnd) {
                 $splitTimeRange->precount->end = $endTimestamp;
             } else {
-                $splitTimeRange->precount = new PrecountAlias();
-                $splitTimeRange->precount->start = $startTimestamp;
                 $splitTimeRange->precount->end = $lastPrecountEnd;
 
                 $splitTimeRange->nextRange = new NextRange();
