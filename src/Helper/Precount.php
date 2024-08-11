@@ -69,7 +69,11 @@ class Precount
         $lastPrecountEnd = $tmp - $tmp % (self::$precountMinuteUnits * 60 * 1000);
 
         // 等於 30 分鐘
-        if ($interval / 60 % self::$precountMinuteUnits === 0 && Carbon::createFromTimestampMs($startTimestamp)->minute % self::$precountMinuteUnits === 0) {
+        if (
+            $interval / 60 % self::$precountMinuteUnits === 0 &&
+            Carbon::createFromTimestampMs($startTimestamp)->minute % self::$precountMinuteUnits === 0 &&
+            $lastPrecountEnd > $startTimestamp
+        ) {
             $splitTimeRange->precount = new PrecountAlias();
             $splitTimeRange->precount->start = $startTimestamp;
 
@@ -96,27 +100,26 @@ class Precount
             $splitTimeRange->precount = new PrecountAlias();
             $splitTimeRange->precount->start = $precountStart;
             $splitTimeRange->precount->end = $precountEnd;
-        }
 
-        $splitTimeRange->prevRange = new PrevRange();
-        $splitTimeRange->prevRange->start = $startTimestamp;
-        $splitTimeRange->prevRange->end = $precountStart;
+            $splitTimeRange->prevRange = new PrevRange();
+            $splitTimeRange->prevRange->start = $startTimestamp;
+            $splitTimeRange->prevRange->end = $precountStart;
 
-        $splitTimeRange->nextRange = new NextRange();
-        $splitTimeRange->nextRange->start = $precountEnd;
-        $splitTimeRange->nextRange->end = $endTimestamp;
+            $splitTimeRange->nextRange = new NextRange();
+            $splitTimeRange->nextRange->start = $precountEnd;
+            $splitTimeRange->nextRange->end = $endTimestamp;
 
-        if (is_null($splitTimeRange->precount)) {
-            $splitTimeRange->nextRange->start = $splitTimeRange->prevRange->start;
-            $splitTimeRange->prevRange = null;
-        }
+            if ($splitTimeRange->prevRange->end === $splitTimeRange->prevRange->start) {
+                $splitTimeRange->prevRange = null;
+            }
 
-        if ($splitTimeRange->prevRange->end === $splitTimeRange->prevRange->start) {
-            $splitTimeRange->prevRange = null;
-        }
-
-        if ($splitTimeRange->nextRange->end === $splitTimeRange->nextRange->start) {
-            $splitTimeRange->nextRange = null;
+            if ($splitTimeRange->nextRange->end === $splitTimeRange->nextRange->start) {
+                $splitTimeRange->nextRange = null;
+            }
+        } else {
+            $splitTimeRange->nextRange = new NextRange();
+            $splitTimeRange->nextRange->start = $startTimestamp;
+            $splitTimeRange->nextRange->end = $endTimestamp;
         }
 
         return $splitTimeRange;
