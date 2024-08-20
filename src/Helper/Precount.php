@@ -17,7 +17,7 @@ class Precount
      * 避免還沒算計算 就去拿 precount 的資料
      * @var int
      */
-    protected static int $bufferSeconds = 35 * 60;
+    protected static int $bufferSeconds = 45 * 60;
 
     /**
      * 多少分鐘算一個 precount

@@ -129,14 +129,24 @@ class PrecountTest extends TestCase
         $this->assertSame(Carbon::parse("2024-03-25 17:00", $tz)->getTimestampMs(), $result->nextRange->start);
         $this->assertSame(Carbon::parse("2024-03-25 17:18:59.999", $tz)->getTimestampMs(), $result->nextRange->end);
 
-        Carbon::setTestNow(Carbon::parse('2024-03-25 17:00', $tz));
+        Carbon::setTestNow(Carbon::parse('2024-03-25 17:36', $tz));
         $start = Carbon::parse('2024-03-25 00:00', $tz)->getTimestampMs();
-        $end = Carbon::parse('2024-03-25 17:00', $tz)->getTimestampMs();
+        $end = Carbon::parse('2024-03-25 17:36', $tz)->getTimestampMs();
         $result = Precount::split($tz, $start, $end);
         $this->assertNull($result->prevRange);
         $this->assertSame(Carbon::parse('2024-03-25 00:00', $tz)->getTimestampMs(), $result->precount->start);
-        $this->assertSame(Carbon::parse('2024-03-25 16:00', $tz)->getTimestampMs(), $result->precount->end);
-        $this->assertSame(Carbon::parse('2024-03-25 16:00', $tz)->getTimestampMs(), $result->nextRange->start);
-        $this->assertSame(Carbon::parse('2024-03-25 17:00', $tz)->getTimestampMs(), $result->nextRange->end);
+        $this->assertSame(Carbon::parse('2024-03-25 16:30', $tz)->getTimestampMs(), $result->precount->end);
+        $this->assertSame(Carbon::parse('2024-03-25 16:30', $tz)->getTimestampMs(), $result->nextRange->start);
+        $this->assertSame(Carbon::parse('2024-03-25 17:36', $tz)->getTimestampMs(), $result->nextRange->end);
+
+        Carbon::setTestNow(Carbon::parse('2024-03-25 17:45', $tz));
+        $start = Carbon::parse('2024-03-25 00:00', $tz)->getTimestampMs();
+        $end = Carbon::parse('2024-03-25 17:36', $tz)->getTimestampMs();
+        $result = Precount::split($tz, $start, $end);
+        $this->assertNull($result->prevRange);
+        $this->assertSame(Carbon::parse('2024-03-25 00:00', $tz)->getTimestampMs(), $result->precount->start);
+        $this->assertSame(Carbon::parse('2024-03-25 17:00', $tz)->getTimestampMs(), $result->precount->end);
+        $this->assertSame(Carbon::parse('2024-03-25 17:00', $tz)->getTimestampMs(), $result->nextRange->start);
+        $this->assertSame(Carbon::parse('2024-03-25 17:36', $tz)->getTimestampMs(), $result->nextRange->end);
     }
 }
