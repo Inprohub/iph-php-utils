@@ -1,0 +1,226 @@
+syntax = "proto3";
+
+package transaction;
+
+option go_package = "./transaction";
+option php_namespace = "Grpc\\Build\\Transaction";
+
+message MemberWalletRequest {
+  string opCode = 1;
+  string account = 2;
+  string walletCode = 3;
+}
+
+message MemberWalletResponse {
+  string account = 1;
+  string walletCode = 2;
+  double balance = 3;
+  string currency = 4;
+}
+
+message MemberWalletsRequest {
+  string opCode = 1;
+  string account = 2;
+}
+
+message MemberWalletsResponse {
+  repeated MemberWallet memberWallets = 1;
+}
+
+message MemberWallet {
+  string account = 1;
+  string walletCode = 2;
+  double balance = 3;
+  string isClose = 4;
+}
+
+message OpEnableWalletRequest {
+  string opCode = 1;
+}
+
+message OpEnableWalletResponse {
+  repeated string wallets = 1;
+}
+
+message SyncMemberWalletsRequest {
+  string opCode = 1;
+  string account = 2;
+}
+
+message SyncMemberWalletsResponse {}
+
+message TransferRequest {
+  string opCode = 1;
+  string account = 2;
+  string walletCode = 3;
+  double amount = 4;
+  string orderNo = 5;
+  string gameBrand = 6;
+}
+
+message TransferAmountBetweenWalletsRequest {
+  string opCode = 1;
+  string account = 2;
+  string fromWalletCode = 3;
+  string ToWalletCode = 4;
+  double amount = 5;
+  string gameBrand = 6;
+}
+
+message BaseTransferResponse {
+  string account = 1;
+  string walletCode = 2;
+  double amount = 3;
+  double before_balance = 4;
+  double balance = 5;
+  string trans_type = 6;
+  string memo = 7;
+}
+
+message TransferWithRebateRequest {
+  string opCode = 1;
+  string account = 2;
+  string walletCode = 3;
+  double amount = 4;
+  double rebateAmount = 5;
+  string orderNo = 6;
+  string subtype = 7;
+  string gameBrand = 8;
+}
+
+message TransferWithRebateResponse {
+  string account = 1;
+  string walletCode = 2;
+  double amount = 3;
+  double before_balance = 4;
+  double balance = 5;
+  string trans_type = 6;
+  double rebateAmount = 7;
+  string memo = 8;
+}
+
+message FreeBonusRequest {
+  string opCode = 1;
+  string account = 2;
+  double amount = 3;
+  string orderNo = 4;
+  string gameBrand = 5;
+}
+
+message StakeWithBetlogRequest {
+  string opCode = 1;
+  string account = 2;
+  string walletCode = 3;
+  double amount = 4;
+  int64 betId = 5;
+  string roundId = 6;
+  bytes betlog = 7;
+  string gameBrand = 8;
+}
+
+message PayoffWithBetlogRequest {
+  string opCode = 1;
+  string account = 2;
+  string walletCode = 3;
+  double amount = 4;
+  int64 betId = 5;
+  string roundId = 6;
+  bytes betlog = 7;
+  string gameBrand = 8;
+}
+
+message CancelStakeWithBetlogRequest {
+  string opCode = 1;
+  string account = 2;
+  string walletCode = 3;
+  double amount = 4;
+  int64 betId = 5;
+  string roundId = 6;
+  bytes betlog = 7;
+  string gameBrand = 8;
+}
+
+message GameTransResponse {
+  string account = 1;
+  string walletCode = 2;
+  double amount = 3;
+  double before_balance = 4;
+  double balance = 5;
+  string trans_type = 6;
+  string memo = 7;
+}
+
+message TransferAmountBetweenMembersRequest {
+  string opCode = 1;
+  string fromAccount = 2;
+  string toAccount = 3;
+  double amount = 4;
+  double minTransfer = 5;
+  string feeOpen = 6;
+  double feeRate = 7;
+  double fixedFee = 8;
+  optional double bonus = 9;
+  string fromTransType = 10;
+  string toTransType = 11;
+}
+
+message TransferAmountBetweenMembersResponse {
+  string account = 1;
+  double beforeBalance = 2;
+  double amount = 3;
+  double balance = 4;
+  string traceId = 5;
+  int64 CreatedAt = 6;
+  string Memo = 7;
+}
+
+message MemberGiftRedemptionRequest {
+  string opCode = 1;
+  string account = 2;
+  double amount = 3;
+  string giftName = 4;
+  string gameBrand = 5;
+}
+
+message MemberGiftRedemptionResponse {
+  string account = 1;
+  double beforeBalance = 2;
+  double amount = 3;
+  double balance = 4;
+  string traceId = 5;
+  int64 CreatedAt = 6;
+  string Memo = 7;
+}
+
+service Transaction {
+  rpc getMemberWallet(MemberWalletRequest) returns (MemberWalletResponse);
+  rpc getMemberWallets(MemberWalletsRequest) returns (MemberWalletsResponse);
+  rpc getOpEnableWallets(OpEnableWalletRequest) returns (OpEnableWalletResponse);
+  rpc syncMemberWallets(SyncMemberWalletsRequest) returns (SyncMemberWalletsResponse);
+
+  // rpc getNotCloseMemberWallets(MemberWalletsRequest) returns (MemberWalletsResponse);
+  rpc transferIn(TransferRequest) returns (BaseTransferResponse);
+  rpc transferOut(TransferRequest) returns (BaseTransferResponse);
+  rpc gameTransferIn(TransferRequest) returns (BaseTransferResponse);
+  rpc gameTransferOut(TransferRequest) returns (BaseTransferResponse);
+  rpc deposit(TransferRequest) returns (BaseTransferResponse);
+  rpc withdrawal(TransferRequest) returns (BaseTransferResponse);
+
+  rpc stakePayout(TransferRequest) returns (BaseTransferResponse); // 下注+派彩
+  rpc stake(TransferRequest) returns (BaseTransferResponse); // 下注
+  rpc payoff(TransferRequest) returns (BaseTransferResponse); // 派彩
+  rpc cancelStake(TransferRequest) returns (BaseTransferResponse); // 取消投注
+  rpc cancelPayout(TransferRequest) returns (BaseTransferResponse); // 取消派彩
+
+  rpc bonus(TransferWithRebateRequest) returns (TransferWithRebateResponse);
+  rpc freeBonus(FreeBonusRequest) returns (BaseTransferResponse);
+  rpc transferAmountBetweenWallets(TransferAmountBetweenWalletsRequest) returns (BaseTransferResponse);
+  rpc stakeWithBetlog(StakeWithBetlogRequest) returns (GameTransResponse);
+  rpc payoffWithBetlog(PayoffWithBetlogRequest) returns (GameTransResponse);
+  rpc cancelStakeWithBetlog(CancelStakeWithBetlogRequest) returns (GameTransResponse);
+
+  // line liff payment 專用
+  rpc transferAmountBetweenMembers(TransferAmountBetweenMembersRequest) returns (TransferAmountBetweenMembersResponse);
+  // member gift redemption
+  rpc memberGiftRedemption(MemberGiftRedemptionRequest) returns (MemberGiftRedemptionResponse);
+}
