@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package queue;
+
+option go_package = './queue';
+option php_namespace = 'Grpc\\Build\\Queue';
+
+service Queue {
+    rpc BetlogReportExport(BetlogReportExportRequest) returns (BetlogReportExportResponse);
+}
+
+message BetlogReportExportRequest {
+    string OpCode = 1;
+    string Timezone = 2;
+    repeated string Header = 3;
+    int64 CreatedAtStart = 4;
+    int64 CreatedAtEnd = 5;
+    optional string Vendor = 6;
+    optional string BetId = 7;
+    optional string GameCode = 8;
+    optional string PlayerName = 9;
+}
+
+message BetlogReportExportResponse {
+    string Filename = 1;
+}
