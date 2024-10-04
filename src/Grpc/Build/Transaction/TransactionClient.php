@@ -73,7 +73,6 @@ class TransactionClient extends \Grpc\BaseStub {
     }
 
     /**
-     * rpc getNotCloseMemberWallets(MemberWalletsRequest) returns (MemberWalletsResponse);
      * @param \Grpc\Build\Transaction\TransferRequest $argument input argument
      * @param array $metadata metadata
      * @param array $options call options
@@ -308,6 +307,20 @@ class TransactionClient extends \Grpc\BaseStub {
         return $this->_simpleRequest('/transaction.Transaction/cancelStakeWithBetlog',
         $argument,
         ['\Grpc\Build\Transaction\GameTransResponse', 'decode'],
+        $metadata, $options);
+    }
+
+    /**
+     * @param \Grpc\Build\Transaction\MarkSourceWalletRequest $argument input argument
+     * @param array $metadata metadata
+     * @param array $options call options
+     * @return \Grpc\UnaryCall
+     */
+    public function markSourceWallet(\Grpc\Build\Transaction\MarkSourceWalletRequest $argument,
+      $metadata = [], $options = []) {
+        return $this->_simpleRequest('/transaction.Transaction/markSourceWallet',
+        $argument,
+        ['\Grpc\Build\Transaction\MarkSourceWalletResponse', 'decode'],
         $metadata, $options);
     }
 

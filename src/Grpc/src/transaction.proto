@@ -192,13 +192,26 @@ message MemberGiftRedemptionResponse {
   string Memo = 7;
 }
 
+message MarkSourceWalletRequest {
+  string opCode = 1;
+  string account = 2;
+  MarkSourceWalletRequestSourceWallet newSourceWallet = 3;
+  string gameWalletCode = 4;
+  string gameBrand = 5;
+}
+
+message MarkSourceWalletRequestSourceWallet {
+  string value = 1;
+}
+
+message MarkSourceWalletResponse {}
+
 service Transaction {
   rpc getMemberWallet(MemberWalletRequest) returns (MemberWalletResponse);
   rpc getMemberWallets(MemberWalletsRequest) returns (MemberWalletsResponse);
   rpc getOpEnableWallets(OpEnableWalletRequest) returns (OpEnableWalletResponse);
   rpc syncMemberWallets(SyncMemberWalletsRequest) returns (SyncMemberWalletsResponse);
 
-  // rpc getNotCloseMemberWallets(MemberWalletsRequest) returns (MemberWalletsResponse);
   rpc transferIn(TransferRequest) returns (BaseTransferResponse);
   rpc transferOut(TransferRequest) returns (BaseTransferResponse);
   rpc gameTransferIn(TransferRequest) returns (BaseTransferResponse);
@@ -218,6 +231,7 @@ service Transaction {
   rpc stakeWithBetlog(StakeWithBetlogRequest) returns (GameTransResponse);
   rpc payoffWithBetlog(PayoffWithBetlogRequest) returns (GameTransResponse);
   rpc cancelStakeWithBetlog(CancelStakeWithBetlogRequest) returns (GameTransResponse);
+  rpc markSourceWallet(MarkSourceWalletRequest) returns (MarkSourceWalletResponse);
 
   // line liff payment 專用
   rpc transferAmountBetweenMembers(TransferAmountBetweenMembersRequest) returns (TransferAmountBetweenMembersResponse);
