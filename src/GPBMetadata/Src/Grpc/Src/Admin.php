@@ -16,9 +16,9 @@ class Admin
         }
         $pool->internalAddGeneratedFile(
             '
-D
+W
 src/grpc/src/admin.protoadmin2
-AdminServiceB	Z./adminbproto3'
+AdminServiceBZ./admin Grpc\\Build\\Adminbproto3'
         , true);
 
         static::$is_initialized = true;

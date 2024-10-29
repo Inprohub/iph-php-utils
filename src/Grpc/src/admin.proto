@@ -3,5 +3,6 @@ syntax = "proto3";
 package admin;
 
 option go_package = "./admin";
+option php_namespace = "Grpc\\Build\\Admin";
 
 service AdminService {}
