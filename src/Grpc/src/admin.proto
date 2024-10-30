@@ -3,7 +3,7 @@ syntax = "proto3";
 package admin;
 
 option go_package = "./admin";
-
+option php_namespace = "Grpc\\Build\\Admin";
 message UnlockEventAwardsRequest {
   message Member {
     string account = 1;

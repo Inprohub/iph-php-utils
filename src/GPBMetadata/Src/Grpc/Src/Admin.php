@@ -16,7 +16,7 @@ class Admin
         }
         $pool->internalAddGeneratedFile(
             '
-¶
+π
 src/grpc/src/admin.protoadmin"É
 UnlockEventAwardsRequest:
 operator (2(.admin.UnlockEventAwardsRequest.Operator6
@@ -30,7 +30,7 @@ class Admin
 timezone (	"
 EmptyResponse2Y
 AdminServiceI
-UnlockEventAward.admin.UnlockEventAwardsRequest.admin.EmptyResponseB	Z./adminbproto3'
+UnlockEventAward.admin.UnlockEventAwardsRequest.admin.EmptyResponseBZ./admin Grpc\\Build\\Adminbproto3'
         , true);
 
         static::$is_initialized = true;
