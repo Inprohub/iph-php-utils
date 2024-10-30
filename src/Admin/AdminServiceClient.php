@@ -16,4 +16,18 @@ class AdminServiceClient extends \Grpc\BaseStub {
         parent::__construct($hostname, $opts, $channel);
     }
 
+    /**
+     * @param \Admin\UnlockEventAwardsRequest $argument input argument
+     * @param array $metadata metadata
+     * @param array $options call options
+     * @return \Grpc\UnaryCall
+     */
+    public function UnlockEventAward(\Admin\UnlockEventAwardsRequest $argument,
+      $metadata = [], $options = []) {
+        return $this->_simpleRequest('/admin.AdminService/UnlockEventAward',
+        $argument,
+        ['\Admin\EmptyResponse', 'decode'],
+        $metadata, $options);
+    }
+
 }

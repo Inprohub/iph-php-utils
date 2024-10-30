@@ -16,9 +16,21 @@ class Admin
         }
         $pool->internalAddGeneratedFile(
             '
-W
-src/grpc/src/admin.protoadmin2
-AdminServiceBZ./admin Grpc\\Build\\Adminbproto3'
+¶
+src/grpc/src/admin.protoadmin"É
+UnlockEventAwardsRequest:
+operator (2(.admin.UnlockEventAwardsRequest.Operator6
+member (2&.admin.UnlockEventAwardsRequest.Member
+event_wallet_code (	,
+Member
+account (	
+	vip_level (	*
+Operator
+code (	
+timezone (	"
+EmptyResponse2Y
+AdminServiceI
+UnlockEventAward.admin.UnlockEventAwardsRequest.admin.EmptyResponseB	Z./adminbproto3'
         , true);
 
         static::$is_initialized = true;

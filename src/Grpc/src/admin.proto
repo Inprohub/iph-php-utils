@@ -3,6 +3,23 @@ syntax = "proto3";
 package admin;
 
 option go_package = "./admin";
-option php_namespace = "Grpc\\Build\\Admin";
 
-service AdminService {}
+message UnlockEventAwardsRequest {
+  message Member {
+    string account = 1;
+    string vip_level = 2;
+  }
+  message Operator {
+    string code = 1;
+    string timezone = 2;
+  }
+  Operator operator = 1;
+  Member member = 2;
+  string event_wallet_code = 3;
+}
+
+message EmptyResponse {}
+
+service AdminService {
+  rpc UnlockEventAward(UnlockEventAwardsRequest) returns (EmptyResponse);
+}
