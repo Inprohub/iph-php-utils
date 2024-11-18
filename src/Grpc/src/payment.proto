@@ -17,6 +17,7 @@ message DepositRequest {
     optional string userIp = 9;
     optional string payTypeNo = 10;
     optional string protocol = 11;
+    string account = 12;
 }
 
 message DepositResponse {
@@ -33,6 +34,7 @@ message WithdrawRequest {
     string notifyUrl = 5;
     string platform = 6;
     BankCard bankCard = 7;
+    string account = 8;
 }
 
 message BankCard {

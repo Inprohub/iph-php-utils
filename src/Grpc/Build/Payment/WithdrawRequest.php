@@ -41,6 +41,10 @@ class WithdrawRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>.payment.BankCard bankCard = 7;</code>
      */
     protected $bankCard = null;
+    /**
+     * Generated from protobuf field <code>string account = 8;</code>
+     */
+    protected $account = '';
 
     /**
      * Constructor.
@@ -55,6 +59,7 @@ class WithdrawRequest extends \Google\Protobuf\Internal\Message
      *     @type string $notifyUrl
      *     @type string $platform
      *     @type \Grpc\Build\Payment\BankCard $bankCard
+     *     @type string $account
      * }
      */
     public function __construct($data = NULL) {
@@ -222,6 +227,28 @@ class WithdrawRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkMessage($var, \Grpc\Build\Payment\BankCard::class);
         $this->bankCard = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string account = 8;</code>
+     * @return string
+     */
+    public function getAccount()
+    {
+        return $this->account;
+    }
+
+    /**
+     * Generated from protobuf field <code>string account = 8;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setAccount($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->account = $var;
 
         return $this;
     }

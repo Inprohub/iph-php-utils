@@ -57,6 +57,10 @@ class DepositRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>optional string protocol = 11;</code>
      */
     protected $protocol = null;
+    /**
+     * Generated from protobuf field <code>string account = 12;</code>
+     */
+    protected $account = '';
 
     /**
      * Constructor.
@@ -75,6 +79,7 @@ class DepositRequest extends \Google\Protobuf\Internal\Message
      *     @type string $userIp
      *     @type string $payTypeNo
      *     @type string $protocol
+     *     @type string $account
      * }
      */
     public function __construct($data = NULL) {
@@ -370,6 +375,28 @@ class DepositRequest extends \Google\Protobuf\Internal\Message
     {
         GPBUtil::checkString($var, True);
         $this->protocol = $var;
+
+        return $this;
+    }
+
+    /**
+     * Generated from protobuf field <code>string account = 12;</code>
+     * @return string
+     */
+    public function getAccount()
+    {
+        return $this->account;
+    }
+
+    /**
+     * Generated from protobuf field <code>string account = 12;</code>
+     * @param string $var
+     * @return $this
+     */
+    public function setAccount($var)
+    {
+        GPBUtil::checkString($var, True);
+        $this->account = $var;
 
         return $this;
     }
